@@ -38,11 +38,11 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
       }
       if(currentlyActive === toBeActive || (duScrollGreedy && !toBeActive)) return;
       if(currentlyActive) {
-        currentlyActive.$element.removeClass('active');
+        currentlyActive.$element.removeClass(spy.className);
         $rootScope.$broadcast('duScrollspy:becameInactive', currentlyActive.$element);
       }
       if(toBeActive) {
-        toBeActive.$element.addClass('active');
+        toBeActive.$element.addClass(spy.className);
         $rootScope.$broadcast('duScrollspy:becameActive', toBeActive.$element);
       }
       context.currentlyActive = toBeActive;

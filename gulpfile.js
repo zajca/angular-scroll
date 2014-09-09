@@ -63,4 +63,4 @@ gulp.task('compress', function() {
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['lint', 'test', 'clean', 'compress']);
+gulp.task('default', ['lint', 'clean', 'compress']);

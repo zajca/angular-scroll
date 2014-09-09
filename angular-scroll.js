@@ -226,7 +226,7 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
     var timer = false, queued = false;
     var handler = function() {
       queued = false;
-      var container = context.container, 
+      var container = context.container,
           containerEl = container[0],
           containerOffset = 0;
 
@@ -258,16 +258,16 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
       }
       if(currentlyActive === toBeActive || (duScrollGreedy && !toBeActive)) return;
       if(currentlyActive) {
-        currentlyActive.$element.removeClass('active');
+        currentlyActive.$element.removeClass(spy.className);
         $rootScope.$broadcast('duScrollspy:becameInactive', currentlyActive.$element);
       }
       if(toBeActive) {
-        toBeActive.$element.addClass('active');
+        toBeActive.$element.addClass(spy.className);
         $rootScope.$broadcast('duScrollspy:becameActive', toBeActive.$element);
       }
       context.currentlyActive = toBeActive;
     };
-    
+
     if(!duScrollSpyWait) {
       return handler;
     }
@@ -281,7 +281,7 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
           if(queued) {
             handler();
           }
-        }, duScrollSpyWait);
+        }, duScrollSpyWait, false);
       } else {
         queued = true;
       }
@@ -295,10 +295,10 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
     var context = {
       spies: []
     };
-    
+
     context.handler = createScrollHandler(context);
     contexts[id] = context;
-    
+
     $scope.$on('$destroy', function() {
       destroyContext($scope);
     });
@@ -353,7 +353,8 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
 
   var addSpy = function(spy) {
     var context = getContextForSpy(spy);
-    getContextForSpy(spy).spies.push(spy);
+    if (!context) return;
+    context.spies.push(spy);
     if (!context.container || !isElementInDocument(context.container)) {
       if(context.container) {
         context.container.off('scroll', context.handler);
@@ -376,7 +377,7 @@ angular.module('duScroll.spyAPI', ['duScroll.scrollContainerAPI'])
 
   return {
     addSpy: addSpy,
-    removeSpy: removeSpy, 
+    removeSpy: removeSpy,
     createContext: createContext,
     destroyContext: destroyContext,
     getContextForScope: getContextForScope
@@ -506,7 +507,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
 .directive('duScrollspy', ["spyAPI", "$timeout", "$rootScope", function(spyAPI, $timeout, $rootScope) {
   'use strict';
 
-  var Spy = function(targetElementOrId, $element, offset) {
+  var Spy = function(targetElementOrId, $element, offset,className) {
     if(angular.isElement(targetElementOrId)) {
       this.target = targetElementOrId;
     } else if(angular.isString(targetElementOrId)) {
@@ -514,6 +515,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
     }
     this.$element = $element;
     this.offset = offset;
+    this.className = className;
   };
 
   Spy.prototype.getTargetElement = function() {
@@ -551,7 +553,8 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
       // Run this in the next execution loop so that the scroll context has a chance
       // to initialize
       $timeout(function() {
-        var spy = new Spy(targetId, $element, -($attr.offset ? parseInt($attr.offset, 10) : 0));
+          console.log($attr.duClass);
+        var spy = new Spy(targetId, $element, -($attr.offset ? parseInt($attr.offset, 10) : 0),$attr.duClass||'active');
         spyAPI.addSpy(spy);
 
         $scope.$on('$destroy', function() {
@@ -559,7 +562,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
         });
         $scope.$on('$locationChangeSuccess', spy.flushTargetCache.bind(spy));
         $rootScope.$on('$stateChangeSuccess', spy.flushTargetCache.bind(spy));
-      }, 0);
+      }, 0, false);
     }
   };
 }]);

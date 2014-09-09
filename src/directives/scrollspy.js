@@ -2,7 +2,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
 .directive('duScrollspy', function(spyAPI, $timeout, $rootScope) {
   'use strict';
 
-  var Spy = function(targetElementOrId, $element, offset) {
+  var Spy = function(targetElementOrId, $element, offset,className) {
     if(angular.isElement(targetElementOrId)) {
       this.target = targetElementOrId;
     } else if(angular.isString(targetElementOrId)) {
@@ -10,6 +10,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
     }
     this.$element = $element;
     this.offset = offset;
+    this.className = className;
   };
 
   Spy.prototype.getTargetElement = function() {
@@ -47,7 +48,7 @@ angular.module('duScroll.scrollspy', ['duScroll.spyAPI'])
       // Run this in the next execution loop so that the scroll context has a chance
       // to initialize
       $timeout(function() {
-        var spy = new Spy(targetId, $element, -($attr.offset ? parseInt($attr.offset, 10) : 0));
+        var spy = new Spy(targetId, $element, -($attr.offset ? parseInt($attr.offset, 10) : 0),$attr.duClass||'active');
         spyAPI.addSpy(spy);
 
         $scope.$on('$destroy', function() {
